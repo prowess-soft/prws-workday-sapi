@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+	<flow name="prws-workday-sapi-main">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="/api/*">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:router config-ref="prws-workday-sapi-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:BAD_REQUEST">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">400
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:METHOD_NOT_ALLOWED">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">405
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">406
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">415
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">501
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="prws-workday-sapi-console">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="/console/*">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console config-ref="prws-workday-sapi-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+ 	<flow
+		name="put:\supervisoryOrganization\assignmentRestrictions:application\json:prws-workday-sapi-config">
+		<flow-ref
+			doc:name="supervisory-organization-assignment-restrictions-impl-flow"
+			doc:id="db4d4c33-1687-418b-8c1d-294829237901"
+			name="supervisory-organization-assignment-restrictions-impl-flow" />
+	</flow>
+	<flow
+		name="put:\employees\organization\assignments:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="emp-org-assignment-impl-Flow"
+			doc:id="b4806242-8464-47df-8d2c-74efd8b6cb4b"
+			name="emp-org-assignment-impl-Flow" />
+	</flow>
+	<flow
+		name="put:\employees\compensation:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="hr-s-wd-comp-api-implFlow"
+			doc:id="89f4fb40-d7da-42f8-97c5-1308f6d3bdfb"
+			name="hr-s-wd-comp-api-implFlow" />
+	</flow>
+	<flow
+		name="put:\supervisoryOrganization\employees:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="move_worker-by-org-impl-Flow"
+			doc:id="5b3593d8-63ed-4071-a3e4-99d3b052ed76"
+			name="move_worker-by-org-impl-Flow" />
+	</flow>
+	<flow name="get:\status:prws-workday-sapi-config">
+		<ee:transform doc:name="Transform Message">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  status: "OK",
+  version: "v1",
+  time: now()
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow
+		name="post:\accountforworkerupdate:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="account-for-worker-update-impl-flow"
+			doc:id="a6f0ac81-6151-4d3c-bb8f-1ec7c68037d8"
+			name="account-for-worker-update-impl-flow" />
+	</flow>
+	<flow
+		name="post:\assessment\status:application\json:prws-workday-sapi-config">
+		<ee:transform doc:name="Transform Message">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  successCode: "201 OK"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="assessment-status-impl-flow-call"
+			doc:id="3891c107-7cca-4388-89f5-890ba5bb9cb9"
+			name="assessment-status-impl-flow" />
+	</flow>
+	<flow
+		name="post:\changeotherids:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="change-other-ids-impl-flow"
+			doc:id="7186acea-5465-4ee6-ace5-0625a767f7a7"
+			name="change-other-ids-impl-flow" />
+	</flow>
+	<flow
+		name="post:\getOrganizations:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="get-organizations-impl-flow"
+			doc:id="b131d885-e986-447a-994c-17720795d407"
+			name="get-organizations-impl-flow" />
+	</flow>
+	<flow
+		name="post:\getWorkers:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="get-worker-impl-Flow"
+			doc:id="1e68a888-2c83-4ccc-866e-e30fbd88b731"
+			name="get-worker-impl-flow" />
+	</flow>
+	<flow
+		name="post:\maintaincontactinformation:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="maintain-contact-information-impl-flow"
+			doc:id="950fc648-d2ce-45d0-8692-5698c3982a0e"
+			name="maintain-contact-information-impl-flow" />
+	</flow>
+	<flow
+		name="post:\employees\organization:application\json:prws-workday-sapi-config">
+		<flow-ref
+			doc:name="employees-add-update-organization-impl-flow"
+			doc:id="c468aa0b-afc7-41fe-bc84-fb0c0c78202c"
+			name="employees-add-update-organization-impl-flow" />
+	</flow>
+	<flow
+		name="post:\organizationInactivate:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="organization-inactive-impl-flow" doc:id="01aa10e1-0128-409d-9c1a-3d708f8cbe6d" name="organization-inactive-impl-flow"/>
+    </flow>
+    <flow name="post:\reactivateOrganization:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="reactivate-organization-impl-flow" doc:id="bb2f1c9f-c8a8-4098-915c-fe8748ba1c97" name="reactivate-organization-impl-flow"/>
+    </flow>
+    <flow name="post:\recognitions\nomination:application\json:prws-workday-sapi-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "success"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<flow-ref doc:name="recognition-nomination-impl-call" doc:id="55341ef7-c48d-4240-9aa5-2bc6fe7616a1" name="recognition-nomination-impl"/>
+    </flow>
+    <flow name="post:\employees\roles:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="employee-roles-impl-Flow" doc:id="42f35fe6-03fd-4244-8472-437ea11d37c5" name="employee-roles-impl-Flow"/>
+    </flow>
+    <flow name="post:\signedDocuments:application\json:prws-workday-sapi-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<flow-ref doc:name="signed-document-flow-impl-call" doc:id="13b5fe21-a19d-46cf-b646-152ad51eabd4" name="signed-documents-flow-impl"/>
+    </flow>
+    <flow name="post:\supervisoryOrganization:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="supervisory-organization-impl-flow-call" doc:id="9038a090-d2b8-4cb3-a017-9b8240122517" name="supervisory-organization-impl"/>
+    </flow>
+    <flow name="post:\signedDocuments\workerDocument:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="worker-signed-document-impl-flow-call" doc:id="bc1c96a7-cfbb-4862-b081-d879a59135fc" name="worker-signed-document-impl-flow"/>
+    </flow>
+    <flow name="post:\workerHistory:application\json:prws-workday-sapi-config">
+		<flow-ref doc:name="get-worker-history-impl-flow" doc:id="eff4ef5f-c3de-4a62-af43-3b253896b1ee" name="get-worker-history-impl-flow"/>
+    </flow>
+	
+
+</mule>

@@ -1,0 +1,14 @@
+http:
+  anypoint:
+    host: ""
+    port: ""
+    reconnection:
+      frequency: ""
+      attempt: ""
+
+cloudhub:
+  https:
+    anypoint:
+      notification:
+        url:
+          path: ""

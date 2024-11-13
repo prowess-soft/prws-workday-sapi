@@ -1,0 +1,7 @@
+%dw 2.0
+
+type auto_b06a2ba6_8fd6_482a_b519_692c159cd3f1_Input_Payload = {|
+  response: Array<{|    id: String,     name: String  |}>
+|} {"mediaType": "application/json",
+"encoding": "UTF-8"}
+

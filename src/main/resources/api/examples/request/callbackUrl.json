@@ -1,0 +1,13 @@
+{
+ "request_id": "request_id12345",
+ "candidate_id": "JOB_APPLICATION_123456789",
+ "meta_data": {
+"environment": "prod",
+ "test_property": "test_property_123"
+ },
+ "overall_status": "in progress",
+ "disposition_code": null,
+ "current_phase_idx": 1,
+ "current_phase_code": "UFLP_Demo_VI",
+ "current_phase_status": "added"
+}

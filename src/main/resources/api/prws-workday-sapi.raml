@@ -1,0 +1,252 @@
+#%RAML 1.0 
+#baseUri: https://mocksvc.mulesoft.com/mocks/0bfdca0a-a0c9-409b-9042-ad971cdd4fdb
+title: Workday Employee System API
+version: v1
+baseUri: https://apiname-v1.eu.cloudhub.io/api
+protocols: [ HTTPS ] 
+
+mediaType: application/json
+
+documentation: 
+  - !include documentation/api-doc.raml
+     
+uses:
+  customtype: types/custom-types.raml
+  
+resourceTypes:
+  post-only-item: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-resourcetypes/1.0.0/post-only-item.raml
+  post-only-item-Worker: !include libraries/patterns/post-only-item-Worker.raml
+  put-only-item-organizationAssignments: !include libraries/patterns/put-only-item-organizationAssignments.raml
+  post-only-item-callbackUrl: !include libraries/patterns/post-only-item-callbackUrl.raml
+  post-only-item-addupdateOrganization: !include libraries/patterns/post-only-item-addupdateOrganization.raml
+  post-only-item-roles: !include libraries/patterns/post-only-item-roles.raml
+  put-only-item-Supervisor_Organization: !include libraries/patterns/put-only-item-Supervisor_Organization.raml
+  put-only-item-Workers_By_Organization: !include libraries/patterns/put-only-item-Workers_By_Organization.raml
+  post-only-item-organizations: !include libraries/patterns/post-only-item-organizations.raml
+  post-only-item-nomination: !include libraries/patterns/post-only-item-nomination.raml
+  put-only-item-Assignments: !include libraries/patterns/put-only-item-Assignments.raml
+  put-only-item-compensation: !include libraries/patterns/put-only-item-compensation.raml
+
+traits:
+  201-item: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/201-item.raml 
+  202-item: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/202-item.raml       
+  400-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/400-fault.raml 
+  401-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/401-fault.raml
+  403-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/403-fault.raml
+  404-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/404-fault.raml
+  405-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/405-fault.raml
+  406-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/406-fault.raml
+  407-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/407-fault.raml
+  415-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/415-fault.raml
+  422-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/422-fault.raml
+  429-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/429-fault.raml
+  500-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/500-fault.raml
+  503-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/503-fault.raml
+  504-fault: !include exchange_modules/781344dd-5c35-44e2-a7d5-54084ffee180/prowess-standard-traits/1.0.1/libraries/traits/responses/504-fault.raml
+                
+ 
+/status:
+  get:
+    description: |
+      The idea is to use this as sanity test mechanism to test whether system has been deployed and configured properly & as a heartbeat mechanism to ensure API is still active.
+     
+    is: [ 400-fault,401-fault,403-fault,404-fault,405-fault,406-fault,407-fault,415-fault,422-fault,429-fault,500-fault,503-fault,504-fault ]
+    responses:
+      200:
+          body:
+            application/json:
+              example: |
+                {
+                   "status": "OK",
+                   "version": "v1",
+                   "time": "2015-08-19T15:10:16Z"
+                }
+    
+/getWorkers:
+  type:  
+    post-only-item-Worker:
+      itemSummary: get worker call
+      itemDescription: Single empId Post
+      inputType: customtype.Item
+      inputExample: !include examples/Id/request.json
+      outputType: customtype.Item
+      outputExample: !include examples/Id/response.json 
+
+/workerHistory:
+  type:
+    post-only-item-Worker:
+      itemSummary: worker History call
+      itemDescription: Single empId Post
+      inputType: customtype.Item
+      inputExample: !include examples/Id/request.json
+      outputType: customtype.Item
+      outputExample: !include examples/Id/response.json 
+
+/employees:
+  /organization:
+    type:  
+      post-only-item-addupdateOrganization:
+        itemSummary: Add or Update Organization
+        itemDescription: Single Organization Post
+        inputType: customtype.Item
+        inputExample: !include examples/Id/request.json
+        outputType: customtype.Item
+        outputExample: !include examples/Id/response.json  
+    /assignments:
+      type:
+        put-only-item-Assignments:
+          itemSummary: change org assignment of employee
+          itemDescription: change org assignment of employee
+          inputType: customtype.Item
+          inputExample: !include examples/Id/request.json
+          outputType: customtype.Item
+          outputExample: !include examples/Id/response.json
+   
+  /compensation:
+    type:
+      put-only-item-compensation: 
+        itemSummary: update compensation details      
+        itemDescription: updated compensation details in Workday
+        inputType: customtype.Item
+        inputExample: !include examples/Id/request.json
+        outputType: customtype.Item
+        outputExample: !include examples/Id/response.json
+      
+  /roles:
+    type:
+      post-only-item:
+        itemSummary: Assign roles to the employee
+        itemDescription: Assign roles to the employee
+        inputType: customtype.Item
+        inputExample: !include examples/Id/request.json
+        outputType: customtype.Item
+        outputExample: !include examples/Id/response.json
+
+/supervisoryOrganization:
+  type:
+    post-only-item:
+      itemSummary: Get supervisoryOrganization after add & update custom report
+      itemDescription: Get supervisoryOrganization after add & update custom report
+      inputType: customtype.Item
+      inputExample: !include examples/Id/request.json
+      outputType: customtype.Item
+      outputExample: !include examples/Id/response.json
+
+  /assignmentRestrictions:
+    type:
+      put-only-item-Supervisor_Organization: 
+        itemSummary: update Supervisor_Organization details      
+        itemDescription: updated Supervisor_Organization details in Workday
+        inputType: customtype.Item
+        inputExample: !include examples/Id/request.json
+        outputType: customtype.Item
+        outputExample: !include examples/Id/response.json 
+
+  /employees:
+        type:
+          put-only-item-Workers_By_Organization: 
+            itemSummary: update Workers_By_Organization      
+            itemDescription: update Workers_By_Organization in Workday
+            inputType: customtype.Item
+            inputExample: !include examples/Id/request.json
+            outputType: customtype.Item
+            outputExample: !include examples/Id/response.json
+            
+/getOrganizations:
+  type:  
+    post-only-item-organizations:
+      itemSummary: get all Organization
+      itemDescription: get all Organization
+      inputType: customtype.Item
+      inputExample: !include examples/Id/request.json
+      outputType: customtype.Item
+      outputExample: !include examples/Id/response.json
+
+/organizationInactivate:
+  type:  
+    post-only-item:
+      itemSummary: Post a single item
+      itemDescription: Single item Post
+      inputType: customtype.Item
+      inputExample: !include examples/organizationInactivate/organizationInactivateRequest.json
+      outputType: customtype.Item
+      outputExample: !include examples/organizationInactivate/organizationInactivateResponse.json
+    
+/reactivateOrganization:
+  type:  
+    post-only-item:
+      itemSummary: Post a single item
+      itemDescription: Single item Post
+      inputType: customtype.Item
+      inputExample: !include examples/reactivateOrganization/reactivateOrganizationRequest.json
+      outputType: customtype.Item
+      outputExample: !include examples/reactivateOrganization/reactivateOrganizationResponse.json
+
+/accountforworkerupdate:
+  type:  
+    post-only-item:
+      itemSummary: Post a single item
+      itemDescription: Single item Post
+      inputType: customtype.Item
+      inputExample: !include examples/accountForWorkerUpdate/updateWorkdayAccountRequest.json
+      outputType: customtype.Item
+      outputExample: !include examples/accountForWorkerUpdate/updateWorkdayAccountResponse.json
+
+/changeotherids:
+  type:  
+    post-only-item:
+      itemSummary: Post a single item
+      itemDescription: Single item Post
+      inputType: customtype.Item
+      inputExample: !include examples/changeOtherIDs/changeOtherIDsRequest.json
+      outputType: customtype.Item
+      outputExample: !include examples/changeOtherIDs/changeOtherIDsResponse.json
+
+/maintaincontactinformation:
+  type:  
+    post-only-item:
+      itemSummary: Post a single item
+      itemDescription: Single item Post
+      inputType: customtype.Item
+      inputExample: !include examples/maintainContactInformation/maintainContactInformationRequest.json
+      outputType: customtype.Item
+      outputExample: !include examples/maintainContactInformation/maintainContactInformationResponse.json
+
+/signedDocuments:
+  type:
+    post-only-item:
+      itemSummary: signed documents
+      itemDescription: signed documents in workday
+      inputType: customtype.signedDocumentsRequest
+      inputExample: !include examples/request/signedDocuments.json
+      outputType: customtype.signedDocumentsResponse
+      outputExample: !include examples/response/signedDocuments.json
+
+  /workerDocument:
+   type:  
+    post-only-item:
+      itemSummary: Post webhook notification to Process API
+      itemDescription: Webhook notification Post
+      inputType: customtype.putDocumentsRequest
+      inputExample: !include examples/workday/putDocumentsRequest.json
+      outputType: customtype.putDocumentsResponse
+      outputExample: !include examples/workday/putDocumentsResponse.json
+/assessment/status:
+  type:
+    post-only-item-callbackUrl:
+      itemSummary: status callback url
+      itemDescription: status callback url in sova
+      inputType: customtype.callbackUrlRequest
+      inputExample: !include examples/request/callbackUrl.json
+      outputType: customtype.callbackUrlResponse
+      outputExample: !include examples/response/callbackUrl.json
+
+/recognitions/nomination:
+  type:
+    post-only-item-nomination:
+      itemSummary: recognitions nominations
+      itemDescription: recognitions nominations in workday
+      inputType: customtype.nominationRequest
+      inputExample: !include examples/request/nomination.json
+      outputType: customtype.nominationResponse
+      outputExample: !include examples/response/nomination.json

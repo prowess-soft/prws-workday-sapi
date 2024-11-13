@@ -1,0 +1,24 @@
+workday:
+  host: "***************"
+  port: "*******"
+  basepath: "*****"
+  path: "*****"
+  username: "*****"
+  password: "*****"
+  workerhistory:
+    path: ""
+  compensationchange:
+    path: ""
+  wdstaffing:
+    path: ""
+  workerdata:
+    path: ""
+  getSupervisoryorg:
+    path: ""
+  wdemployee:
+    path: ""
+
+adaptive:
+  logger:
+    mule:
+      env: dev

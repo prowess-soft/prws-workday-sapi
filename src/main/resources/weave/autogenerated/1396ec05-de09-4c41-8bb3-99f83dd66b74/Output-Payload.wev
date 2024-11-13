@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_1396ec05_de09_4c41_8bb3_99f83dd66b74_Output_Payload = { _?: Any } {"label": "Simple Item Datatype"}
+

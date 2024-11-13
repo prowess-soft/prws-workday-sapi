@@ -1,0 +1,35 @@
+#%RAML 1.0 ResourceType
+  description: <<collectionSummary>>
+  get:
+    description: The GET method requests a representation of the specified resource.
+    is: [ 200-collection: {collectionType: <<collectionType>>, collectionExample: <<collectionExample>>}, 
+        304-fault,400-fault,401-fault,403-fault,404-fault,405-fault,406-fault,407-fault,415-fault,422-fault,429-fault,500-fault,503-fault,504-fault ]
+        
+  post:
+    description: The POST method is used to submit an entity to the specified resource.
+    body:
+      type: <<collectionType>>
+      example: <<postPatchExample>>
+    is: [ 201-item: {itemType: <<collectionType>>, itemExample: <<postPatchExample>>}, 202-item: {itemType: <<collectionType>>, itemExample: <<postPatchExample>>},
+        400-fault,401-fault,403-fault,404-fault,405-fault,406-fault,407-fault,415-fault,422-fault,429-fault,500-fault,503-fault,504-fault ]        
+
+  put:
+    description: The PUT method replaces all current representations of the target resource with the request payload.
+    body:
+      type: <<collectionType>>
+      example: <<putExample>>
+    is: [ 204-response,
+        400-fault,401-fault,403-fault,404-fault,405-fault,406-fault,407-fault,415-fault,422-fault,429-fault,500-fault,503-fault,504-fault ]        
+
+  patch:
+    description: The PATCH method is used to apply partial modifications to a resource.
+    body:
+      type: <<collectionType>>
+      example: <<postPatchExample>>
+    is: [ 204-response,
+        400-fault,401-fault,403-fault,404-fault,405-fault,406-fault,407-fault,415-fault,422-fault,429-fault,500-fault,503-fault,504-fault ]        
+  
+  delete:
+    description: The DELETE method deletes the specified resource.
+    is: [ 204-response,
+        400-fault,401-fault,403-fault,404-fault,405-fault,406-fault,407-fault,415-fault,422-fault,429-fault,500-fault,503-fault,504-fault ]                

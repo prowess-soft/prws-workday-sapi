@@ -1,0 +1,8 @@
+#%RAML 1.0 Trait
+    responses:
+      500:
+        description: !include documentation/500-description
+        body:
+          application/json:
+            type: !include ../../types/platformfault.raml
+            example: !include ../../../examples/faults/500.json

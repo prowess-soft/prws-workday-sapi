@@ -1,0 +1,4 @@
+
+#go to api manager to get these values, used for api autodiscovery
+api:
+  id: "*****"

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<sub-flow name="hr-s-wd-comp-api-implFlow" doc:id="e8875e30-9733-452a-aa5b-7fc4380d725d" >
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="3f94c38a-dc0a-47a9-abbf-2afa36b8cd78">
+			<http:request method="POST" doc:name="Request_Compensation" doc:id="8ea8bcc1-c75b-455d-a917-adf29190e265" config-ref="HTTP_Request_Workday_Configuration" path="${compensationchange.path}"/>
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="99601eb2-e456-430f-9dfe-0d76580d853a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="move_worker-by-org-impl-Flow" doc:id="6adbd3e2-6e16-495c-920b-168b9a8d25d9" >
+		<flow-ref doc:name="Workday-staffing-flow-call" doc:id="c156d482-d13f-435e-8a79-9dd14f7a35d9" name="Workday-staffing-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="c5bde739-0cec-4245-9087-48c53700938e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow doc:id="317448ee-8280-4de0-81bb-a2c0403499fb" name="emp-org-assignment-impl-Flow">
+		<flow-ref doc:name="Workday-staffing-flow-call" doc:id="a00decac-a8c5-4f80-a3d8-96659a675fe4" name="Workday-staffing-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="17f2ea76-77b9-4ac9-b2af-8f747694af2b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="employee-roles-impl-Flow" doc:id="9a8dc764-f049-4a62-96c1-7d6f948dbc05" >
+		<flow-ref doc:name="Workday-staffing-flow-call" doc:id="e687eb88-d9ee-4ead-b721-fa7b55c591a0" name="Workday-staffing-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="6e92cfab-2761-45d4-ac9f-f0a68f49b650" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="worker-signed-document-impl-flow" doc:id="9a0a2652-b9fd-4892-b368-9f02cbaf4e0b" >
+		<flow-ref doc:name="Workday-staffing-flow-call" doc:id="3d514317-626d-407c-b96e-ee934208a19d" name="Workday-staffing-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="2c1bb881-5e84-4a98-b8f2-fb68f4aa2304" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="Workday-staffing-flow" doc:id="20dd9b10-5122-48cb-8cd7-18c2c10251b9" >
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="382e8bf4-3a2c-4e14-997a-a2bc1d4118ee" >
+			<http:request method="POST" doc:name="Request" doc:id="e9a95e32-636c-482d-b29f-0079f1c6267f" path="${wdstaffing.path}" config-ref="HTTP_Request_Workday_Configuration"/>
+		</until-successful>
+	</sub-flow>
+	<sub-flow name="assessment-status-impl-flow" doc:id="bb3495aa-5772-4ce9-9eb7-b0393b6e3e9a" >
+		<flow-ref doc:name="Workday-staffing-flow-call" doc:id="131c49cd-867d-4a56-bb19-1d3369ae629d" name="Workday-staffing-flow" />
+		<ee:transform doc:name="Transform Message" doc:id="c366ab54-2381-4453-84ad-57a4f19c6f42" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="get-worker-impl-flow" doc:id="6bb217b9-45bd-4ae1-ad3f-7e9f9ca2ebd3" >
+		<flow-ref doc:name="Workday-staffing-flow-call" doc:id="e3ded385-5be1-46af-a12a-8d63d505c653" name="Workday-staffing-flow" />
+		<ee:transform doc:name="Transform Message" doc:id="6d684fef-d3a2-4cd6-8dd2-8edbe7672e12" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="supervisory-organization-impl" doc:id="086785a4-6712-4ac8-b94d-8d772170b510" >
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="d7cb3662-9491-4f36-a242-ff99743e6299" >
+			<http:request method="POST" doc:name="Requester for getSupervisory_org details" doc:id="8a4a6b74-b80c-4a73-a8c0-b4c2bbed09b0" path="${getSupervisoryorg.path}" config-ref="HTTP_Request_Workday_Configuration"/>
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="681842bd-203f-4376-8345-609e5d9d7ace" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="get-worker-history-impl-flow" doc:id="4839dfc3-9590-4c7b-9d36-0fe86af06aa1" >
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="d33b57f5-39f4-4740-870d-deb5f4c1f90f" >
+			<http:request method="POST" doc:name="Requester for workerhistory" doc:id="e6e8881c-fda3-4c22-95af-93719b88df70" path="${workerhistory.path}" config-ref="HTTP_Request_Workday_Configuration"/>
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="9f875695-8fd7-4f5e-83f0-0cf7a9c401c8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="supervisory-organization-assignment-restrictions-impl-flow" doc:id="bf211def-769e-47fa-a601-9f1a823c5834" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="84f762db-a676-44a4-84e2-6daff341f1c0" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="8bb2c9b0-712e-49b6-9e8c-cc3a0fea0f0c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="workday-employee-request-post-flow" doc:id="de65085e-7572-4a4b-9262-53d8d2573455" >
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="2dfdef2f-9041-4edf-bf97-7446c93b7986" >
+			<http:request method="POST" doc:name="Request for Employee Post Calls" doc:id="ca9a31e9-e194-43b9-9b5f-0ec324ced530" config-ref="HTTP_Request_Workday_Configuration" path="${wdemployee.path}"/>
+		</until-successful>
+	</sub-flow>
+	<sub-flow name="employees-add-update-organization-impl-flow" doc:id="b4ccb857-fb68-4e98-9867-d0f437dcbf0d" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="984f9fd7-a3db-43a8-a136-7f34696aa462" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="e6d16ce0-606a-4110-925c-b58ae7aa80cb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="get-organizations-impl-flow" doc:id="0e83912c-2f5b-4a74-83fe-c02984bfa815" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="ac9d8800-882c-43fe-8c8c-630513a39bfa" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="62123e10-03b1-4255-ae43-53f42b5d2842" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="organization-inactive-impl-flow" doc:id="eae11997-612c-4bb3-af47-205cc09fa22b" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="fdf4fa18-795b-4e0e-83a7-403bd7ab9c6d" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="8fed6ad6-b41c-4547-a386-077c05ffda94" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="reactivate-organization-impl-flow" doc:id="afc02fdf-1ecd-4c55-9451-ac63dc6b132d" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="a92a840e-d271-47ca-ad4b-1ce99876ef82" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="5e700091-9960-432b-beed-587dd4bff9b3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="account-for-worker-update-impl-flow" doc:id="d7e0aace-c3f4-4fd4-897f-ce15c9f8761b" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="6385e12e-8cf3-4cd6-834b-9a1fa5c04435" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="dc3c533d-b236-4f02-b527-c82136ce8e36" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="change-other-ids-impl-flow" doc:id="fc775d1f-4a03-414c-8292-1eadef619ef9" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="85d887de-a05a-4f81-82a4-225b5fef85c3" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="fcf639fd-ed79-4542-8499-a656c5f3b7fc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="maintain-contact-information-impl-flow" doc:id="23779edd-beec-4b84-8205-25d2a8f8552d" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="15ecf669-a0e8-4720-985b-cc819399017f" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="c6d65557-540b-4098-9ec1-80c7989d1978" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="recognition-nomination-impl" doc:id="48bf98e2-5765-4464-80d1-150d0184f7e1" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="d5ea363f-4c9d-438f-9caa-5cd532494baf" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="1e8c394c-b81d-45c4-bb46-0ff7c4c150f7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="signed-documents-flow-impl" doc:id="5f997766-09c1-4691-9cf3-7c140ff14361" >
+		<flow-ref doc:name="workday-employee-request-post-flow-call" doc:id="f74baf2b-d4df-4778-8be9-c1bcdfc64deb" name="workday-employee-request-post-flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="16158c48-a822-420a-86eb-d3d5226e2b2a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
